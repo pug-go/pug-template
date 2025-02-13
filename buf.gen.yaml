@@ -1,0 +1,17 @@
+version: v2
+plugins:
+  - local: bin/protoc-gen-go
+    out: gen
+    opt:
+      - paths=source_relative
+  - local: bin/protoc-gen-go-grpc
+    out: gen
+    opt:
+      - paths=source_relative
+  - local: bin/protoc-gen-openapiv2
+    strategy: all
+    out: .
+    opt:
+      - allow_merge=true
+      - merge_file_name=app
+      - generate_unbound_methods=false
