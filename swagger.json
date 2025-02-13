@@ -1,8 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "pug/v1/pug.proto",
-    "version": "version not set"
+    "title": "PugService API",
+    "description": "API для сервиса Pug.",
+    "version": "1.0.0"
   },
   "tags": [
     {

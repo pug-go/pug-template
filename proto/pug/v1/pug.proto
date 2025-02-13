@@ -5,6 +5,15 @@ option go_package = "github.com/pug-go/pug/gen/proto/v1/pug;pugv1";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "PugService API";
+    version: "1.0.0";
+    description: "API для сервиса Pug.";
+  };
+};
 
 service PugService {
   rpc HelloPug(HelloPugRequest) returns (HelloPugResponse) {
