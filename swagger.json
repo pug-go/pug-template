@@ -17,7 +17,7 @@
     "application/json"
   ],
   "paths": {
-    "/v2/pugs/hello": {
+    "/v1/pugs/hello": {
       "get": {
         "operationId": "PugService_HelloPug",
         "responses": {

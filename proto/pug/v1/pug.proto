@@ -18,7 +18,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service PugService {
   rpc HelloPug(HelloPugRequest) returns (HelloPugResponse) {
     option (google.api.http) = {
-      get: "/v2/pugs/hello"
+      get: "/v1/pugs/hello"
     };
   }
   rpc Internal(InternalRequest) returns (google.protobuf.Empty) {}
