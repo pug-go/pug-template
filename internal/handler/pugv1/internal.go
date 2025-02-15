@@ -11,7 +11,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *PugServiceServer) Internal(_ context.Context, req *pugv1.InternalRequest) (*emptypb.Empty, error) {
+func (h *PugServiceServer) Internal(_ context.Context, req *pugv1.InternalRequest) (*emptypb.Empty, error) {
 	fmt.Println(req.GetMessage())
 	return &emptypb.Empty{}, nil
 }
