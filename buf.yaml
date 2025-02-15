@@ -12,7 +12,6 @@ lint:
   except:
     - FIELD_NOT_REQUIRED
     - PACKAGE_NO_IMPORT_CYCLE
-  disallow_comment_ignores: true
 breaking:
   use:
     - FILE

@@ -17,7 +17,7 @@
     "application/json"
   ],
   "paths": {
-    "/v1/pugs/hello": {
+    "/v1/pugs/hello/{name}": {
       "get": {
         "operationId": "PugService_HelloPug",
         "responses": {
@@ -37,8 +37,8 @@
         "parameters": [
           {
             "name": "name",
-            "in": "query",
-            "required": false,
+            "in": "path",
+            "required": true,
             "type": "string"
           }
         ],

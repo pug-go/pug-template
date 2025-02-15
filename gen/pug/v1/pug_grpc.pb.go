@@ -4,7 +4,7 @@
 // - protoc             (unknown)
 // source: pug/v1/pug.proto
 
-package pugv1
+package pugv1pb
 
 import (
 	context "context"

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package pug.v1;
-option go_package = "github.com/pug-go/pug/gen/proto/v1/pug;pugv1";
+option go_package = "github.com/pug-go/pug/gen/proto/v1/pugpb;pugv1pb";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
@@ -18,7 +18,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
 service PugService {
   rpc HelloPug(HelloPugRequest) returns (HelloPugResponse) {
     option (google.api.http) = {
-      get: "/v1/pugs/hello"
+      get: "/v1/pugs/hello/{name}"
     };
   }
   rpc Internal(InternalRequest) returns (google.protobuf.Empty) {}

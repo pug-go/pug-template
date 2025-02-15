@@ -1,3 +1,0 @@
-# example
-
-TODO: REMOVE IT BEFORE MERGE.
