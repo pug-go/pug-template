@@ -3,7 +3,7 @@ deps:
   - buf.build/googleapis/googleapis
   - buf.build/grpc-ecosystem/grpc-gateway
 modules:
-  - path: proto
+  - path: api
 lint:
   use:
     - STANDARD
