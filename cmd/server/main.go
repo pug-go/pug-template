@@ -1,15 +1,24 @@
 package main
 
 import (
-	"github.com/ilyakaznacheev/cleanenv"
+	"flag"
+
 	"github.com/pug-go/pug-template/internal/config"
 	"github.com/pug-go/pug-template/internal/handler"
 	"github.com/pug-go/pug-template/internal/server"
 )
 
+var flagconf string
+
+func init() {
+	flag.StringVar(&flagconf, "conf", "", "config path, example: -conf .deployment/values_local.yaml")
+}
+
 func main() {
-	cfg := config.GlobalConfig
-	err := cleanenv.ReadConfig(".deployment/values_local.yaml", &cfg)
+	flag.Parse()
+
+	cfg := &config.GlobalConfig
+	err := cfg.Load(flagconf)
 	if err != nil {
 		panic(err)
 	}
