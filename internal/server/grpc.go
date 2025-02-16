@@ -1,41 +1,46 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net"
 
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
 
 type GrpcServer struct {
-	server  *grpc.Server
-	address string
+	address            string
+	registerServicesFn func(server *grpc.Server)
+	server             *grpc.Server
 }
 
-type RegisterGrpcServicesFn func(server *grpc.Server)
+// TODO: Сюда хендлеры?
 
-func NewGrpcServer(port int16) *GrpcServer {
+func NewGrpcServer(
+	port int16,
+	registerServicesFn func(server *grpc.Server),
+) *GrpcServer {
 	return &GrpcServer{
-		address: fmt.Sprintf(":%d", port),
-		server:  grpc.NewServer(),
+		address:            fmt.Sprintf(":%d", port),
+		server:             grpc.NewServer(),
+		registerServicesFn: registerServicesFn,
 	}
 }
 
-func (s *GrpcServer) Run(registerServicesFn RegisterGrpcServicesFn) error {
+func (s *GrpcServer) Run() error {
 	listener, err := net.Listen("tcp", s.address)
 	if err != nil {
 		return fmt.Errorf("failed to start gRPC server on %s: %w", s.address, err)
 	}
 
-	registerServicesFn(s.server)
+	s.registerServicesFn(s.server)
 
+	log.Info("gRPC server listening on " + s.address)
 	return s.server.Serve(listener)
 }
 
-func (s *GrpcServer) Stop() {
-	s.server.Stop()
-}
-
-func (s *GrpcServer) GracefulStop() {
+func (s *GrpcServer) Stop(_ context.Context) error {
 	s.server.GracefulStop()
+	return nil
 }

@@ -5,6 +5,7 @@ go 1.23.6
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
+	github.com/sirupsen/logrus v1.9.3
 	google.golang.org/genproto/googleapis/api v0.0.0-20250212204824-5a70512c5d8b
 	google.golang.org/grpc v1.70.0
 	google.golang.org/protobuf v1.36.5

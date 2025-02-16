@@ -7,19 +7,25 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-type HttpServer struct {
-	server   *http.Server
-	grpcPort int16
-	gwmux    *runtime.ServeMux
-}
-
 type InitHttpRoutesFn func(mux *runtime.ServeMux, conn *grpc.ClientConn) error
 
-func NewHttpServer(httpPort int16, grpcPort int16) *HttpServer {
+type HttpServer struct {
+	server           *http.Server
+	grpcPort         int16
+	initHttpRoutesFn InitHttpRoutesFn
+	gwmux            *runtime.ServeMux
+}
+
+func NewHttpServer(
+	httpPort int16,
+	grpcPort int16,
+	initHttpRoutesFn InitHttpRoutesFn,
+) *HttpServer {
 	gwmux := runtime.NewServeMux()
 
 	return &HttpServer{
@@ -29,12 +35,13 @@ func NewHttpServer(httpPort int16, grpcPort int16) *HttpServer {
 			ReadTimeout:  60 * time.Second,
 			WriteTimeout: 60 * time.Second,
 		},
-		grpcPort: grpcPort,
-		gwmux:    gwmux,
+		grpcPort:         grpcPort,
+		initHttpRoutesFn: initHttpRoutesFn,
+		gwmux:            gwmux,
 	}
 }
 
-func (s *HttpServer) Run(initHttpRoutesFn InitHttpRoutesFn) error {
+func (s *HttpServer) Run() error {
 	// create grpc client conn for internal http proxy
 	conn, err := grpc.NewClient(
 		fmt.Sprintf("0.0.0.0:%d", s.grpcPort),
@@ -44,18 +51,16 @@ func (s *HttpServer) Run(initHttpRoutesFn InitHttpRoutesFn) error {
 		return fmt.Errorf("failed to dial internal grpc conn: %s", err)
 	}
 
-	err = initHttpRoutesFn(s.gwmux, conn)
+	err = s.initHttpRoutesFn(s.gwmux, conn)
 	if err != nil {
 		return err
 	}
 
+	log.Info("http server listening on: ", s.server.Addr)
 	return s.server.ListenAndServe()
 }
 
-func (s *HttpServer) Shutdown(ctx context.Context) error {
+func (s *HttpServer) Stop(ctx context.Context) error {
+	s.server.SetKeepAlivesEnabled(false)
 	return s.server.Shutdown(ctx)
-}
-
-func (s *HttpServer) SetKeepAlivesEnabled(v bool) {
-	s.server.SetKeepAlivesEnabled(v)
 }

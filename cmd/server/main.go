@@ -2,10 +2,13 @@ package main
 
 import (
 	"flag"
+	"time"
 
 	"github.com/pug-go/pug-template/internal/config"
 	"github.com/pug-go/pug-template/internal/handler"
 	"github.com/pug-go/pug-template/internal/server"
+	"github.com/pug-go/pug-template/pkg/pug"
+	log "github.com/sirupsen/logrus"
 )
 
 var flagconf string
@@ -17,6 +20,10 @@ func init() {
 func main() {
 	flag.Parse()
 
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetReportCaller(true)
+	time.Local = time.UTC
+
 	cfg := &config.GlobalConfig
 	err := cfg.Load(flagconf)
 	if err != nil {
@@ -24,17 +31,13 @@ func main() {
 	}
 
 	handlers := handler.New()
+	grpcServer := server.NewGrpcServer(cfg.GrpcPort, handlers.RegisterGrpcServices)
+	httpServer := server.NewHttpServer(cfg.HttpPort, cfg.GrpcPort, handlers.InitHttpRoutes)
 
-	grpcServer := server.NewGrpcServer(cfg.GrpcPort)
-	go func() {
-		err = grpcServer.Run(handlers.RegisterGrpcServices)
-		if err != nil {
-			panic(err)
-		}
-	}()
-
-	httpServer := server.NewHttpServer(cfg.HttpPort, cfg.GrpcPort)
-	if err = httpServer.Run(handlers.InitHttpRoutes); err != nil {
+	app, err := pug.NewApp()
+	if err != nil {
 		panic(err)
 	}
+
+	app.Run(grpcServer, httpServer)
 }
