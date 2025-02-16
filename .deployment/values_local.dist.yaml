@@ -1,0 +1,23 @@
+service:
+  name: "pug"
+  basePath: ""
+  domain: "localhost"
+  ports:
+    - name: http
+      port: 8080
+    - name: grpc
+      port: 8082
+    - name: debug
+      port: 8084
+
+secrets:
+#  - name: pg_host
+#    value: localhost
+#  - name: pg_user
+#    value: user
+#  - name: pg_password
+#    value: password
+#  - name: pg_dbname
+#    value: "pug"
+#  - name: pg_port
+#    value: 6432

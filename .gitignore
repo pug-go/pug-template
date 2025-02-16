@@ -1,2 +1,3 @@
 bin/
 .idea/
+.deployment/values_local.yaml
