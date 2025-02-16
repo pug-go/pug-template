@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "PugService API",
-    "description": "API для сервиса Pug.",
+    "description": "API для сервиса Pug",
     "version": "1.0.0"
   },
   "tags": [

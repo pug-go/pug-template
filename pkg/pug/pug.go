@@ -11,10 +11,12 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	log "github.com/sirupsen/logrus"
+	swagger "github.com/swaggo/http-swagger"
+	"google.golang.org/grpc"
+
 	"github.com/pug-go/pug-template/pkg/closer"
 	"github.com/pug-go/pug-template/pkg/healthcheck"
-	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 )
 
 const gracefulTimeout = 10 * time.Second
@@ -47,11 +49,12 @@ func NewApp() (*App, error) {
 func (a *App) Run(
 	grpcServer Server,
 	httpServer Server,
+	debugPort int16,
 ) {
 	// starting servers
 	go a.startGrpcServer(grpcServer)
 	go a.startHttpServer(httpServer)
-	go a.startDebugServer()
+	go a.startDebugServer(debugPort)
 
 	// gracefully shutdown
 	quit := make(chan os.Signal, 1)
@@ -105,8 +108,91 @@ func (a *App) startHttpServer(httpServer Server) {
 	}
 }
 
-func (a *App) startDebugServer() {
-	// TODO
+func (a *App) startDebugServer(debugPort int16) {
+	mux := http.NewServeMux()
+
+	// TODO: Pass data for proxy to http server
+
+	swaggerRoute := "docs"
+	swaggerJsonPath := fmt.Sprintf("/%s/swagger.json", swaggerRoute)
+	swaggerPath := fmt.Sprintf("/%s/", swaggerRoute)
+
+	mux.HandleFunc(swaggerJsonPath, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		http.ServeFile(w, r, "swagger.json")
+	})
+	mux.HandleFunc(swaggerPath, swagger.Handler(
+		swagger.URL("swagger.json"),
+		swagger.BeforeScript(
+			`const UrlMutatorPlugin = (system) => ({
+			  rootInjects: {
+				setHost: (host) => {
+				  const jsonSpec = system.getState().toJSON().spec.json;
+				  const newJsonSpec = Object.assign({}, jsonSpec, { host });
+		
+				  return system.specActions.updateJsonSpec(newJsonSpec);
+				},
+				setTitle: (title) => {
+				  const jsonSpec = system.getState().toJSON().spec.json;
+				  const newJsonSpec = Object.assign({}, jsonSpec, { info: { title } });
+		
+				  return system.specActions.updateJsonSpec(newJsonSpec);
+				},
+				setBasePath: (basePath) => {
+				  const jsonSpec = system.getState().toJSON().spec.json;
+				  const newJsonSpec = Object.assign({}, jsonSpec, { basePath });
+		
+				  return system.specActions.updateJsonSpec(newJsonSpec);
+				}
+			  }
+			});`),
+		swagger.Plugins([]string{"UrlMutatorPlugin"}),
+		//swagger.UIConfig(map[string]string{
+		//	"onComplete": fmt.Sprintf(
+		//		`() => {
+		//			window.ui.setHost(''); // current host
+		//			window.ui.setTitle('%s');
+		//			window.ui.setBasePath('%s');
+		//		}`, appName, basePath),
+		//	"requestInterceptor": fmt.Sprintf(
+		//		`(req) => {
+		//			req.headers["X-Source"] = "%s";
+		//			return req;
+		//	  	}`, appName),
+		//}),
+	))
+	mux.HandleFunc(healthcheck.CheckHandlerPathReadiness, a.hc.ReadyEndpointHandlerFunc)
+	mux.HandleFunc(healthcheck.CheckHandlerPathLiveness, a.hc.LiveEndpointHandlerFunc)
+	// mux.HandleFunc("/metrics", promhttp.Handler())
+
+	// s.Use(middleware.Recovery)
+
+	srv := &http.Server{
+		Addr:    fmt.Sprintf(":%d", debugPort),
+		Handler: mux,
+	}
+
+	a.debugCloser.Add(func() error {
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+
+		srv.SetKeepAlivesEnabled(false)
+		if err := srv.Shutdown(ctx); err != nil {
+			return fmt.Errorf("http.debug: error during shutdown: %w", err)
+		}
+		log.Info("http.debug: gracefully stopped")
+
+		return nil
+	})
+
+	if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		log.Fatalf("http.debug: error occurred while running server: %s", err.Error())
+	}
 }
 
 func (a *App) shutdown() {

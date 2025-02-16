@@ -4,11 +4,12 @@ import (
 	"flag"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/pug-go/pug-template/internal/config"
 	"github.com/pug-go/pug-template/internal/handler"
 	"github.com/pug-go/pug-template/internal/server"
 	"github.com/pug-go/pug-template/pkg/pug"
-	log "github.com/sirupsen/logrus"
 )
 
 var flagconf string
@@ -39,5 +40,5 @@ func main() {
 		panic(err)
 	}
 
-	app.Run(grpcServer, httpServer)
+	app.Run(grpcServer, httpServer, cfg.DebugPort)
 }

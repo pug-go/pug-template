@@ -11,7 +11,7 @@ option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
     title: "PugService API";
     version: "1.0.0";
-    description: "API для сервиса Pug.";
+    description: "API для сервиса Pug";
   };
 };
 
