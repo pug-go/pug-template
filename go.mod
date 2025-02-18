@@ -5,6 +5,7 @@ go 1.23.6
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.1
 	github.com/ilyakaznacheev/cleanenv v1.5.0
+	github.com/rs/cors v1.11.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/swaggo/http-swagger v1.3.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20250212204824-5a70512c5d8b

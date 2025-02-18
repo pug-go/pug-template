@@ -3,12 +3,9 @@ service:
   basePath: ""
   domain: "localhost"
   ports:
-    - name: http
-      port: 8080
-    - name: grpc
-      port: 8082
-    - name: debug
-      port: 8084
+    http: 8080
+    grpc: 8082
+    debug: 8084
 
 secrets:
 #  - name: pg_host

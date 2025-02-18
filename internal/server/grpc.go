@@ -10,33 +10,28 @@ import (
 )
 
 type GrpcServer struct {
-	address            string
-	registerServicesFn func(server *grpc.Server)
 	server             *grpc.Server
+	registerServicesFn func(server *grpc.Server)
 }
 
-// TODO: Сюда хендлеры?
-
-func NewGrpcServer(
-	port int16,
-	registerServicesFn func(server *grpc.Server),
-) *GrpcServer {
+func NewGrpcServer(registerServicesFn func(server *grpc.Server)) *GrpcServer {
 	return &GrpcServer{
-		address:            fmt.Sprintf(":%d", port),
 		server:             grpc.NewServer(),
 		registerServicesFn: registerServicesFn,
 	}
 }
 
-func (s *GrpcServer) Run() error {
-	listener, err := net.Listen("tcp", s.address)
+func (s *GrpcServer) Run(port int16) error {
+	address := fmt.Sprintf(":%d", port)
+
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
-		return fmt.Errorf("failed to start gRPC server on %s: %w", s.address, err)
+		return fmt.Errorf("failed to start gRPC server on %s: %w", address, err)
 	}
 
 	s.registerServicesFn(s.server)
 
-	log.Info("gRPC server listening on " + s.address)
+	log.Info("gRPC server listening on " + address)
 	return s.server.Serve(listener)
 }
 

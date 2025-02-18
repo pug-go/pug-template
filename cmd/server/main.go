@@ -32,13 +32,19 @@ func main() {
 	}
 
 	handlers := handler.New()
-	grpcServer := server.NewGrpcServer(cfg.GrpcPort, handlers.RegisterGrpcServices)
-	httpServer := server.NewHttpServer(cfg.HttpPort, cfg.GrpcPort, handlers.InitHttpRoutes)
+	grpcServer := server.NewGrpcServer(handlers.RegisterGrpcServices)
+	httpServer := server.NewHttpServer(handlers.InitHttpRoutes)
 
-	app, err := pug.NewApp()
+	app, err := pug.NewApp(pug.Config{
+		ServiceName: cfg.Service.Name,
+		Domain:      cfg.Service.Domain,
+		GrpcPort:    cfg.Service.Ports.Grpc,
+		HttpPort:    cfg.Service.Ports.Http,
+		DebugPort:   cfg.Service.Ports.Debug,
+	})
 	if err != nil {
 		panic(err)
 	}
 
-	app.Run(grpcServer, httpServer, cfg.DebugPort)
+	app.Run(grpcServer, httpServer)
 }

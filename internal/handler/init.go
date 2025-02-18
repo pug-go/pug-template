@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc"
+
 	pugv1pb "github.com/pug-go/pug-template/gen/pug/v1"
 	"github.com/pug-go/pug-template/internal/handler/pugv1"
-	"google.golang.org/grpc"
 )
 
 type Handler struct{}

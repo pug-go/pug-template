@@ -5,9 +5,15 @@ import (
 )
 
 type Config struct {
-	GrpcPort  int16 `yaml:"service.ports.grpc" env:"GRPC_PORT" env-default:"8080"`
-	HttpPort  int16 `yaml:"service.ports.http" env:"HTTP_PORT" env-default:"8082"`
-	DebugPort int16 `yaml:"service.ports.debug" env:"DEBUG_PORT" env-default:"8084"`
+	Service struct {
+		Name   string `yaml:"name" env:"SERVICE_NAME"`
+		Domain string `yaml:"domain" env:"DOMAIN"`
+		Ports  struct {
+			Grpc  int16 `yaml:"grpc" env:"GRPC_PORT" env-default:"8080"`
+			Http  int16 `yaml:"http" env:"HTTP_PORT" env-default:"8082"`
+			Debug int16 `yaml:"debug" env:"DEBUG_PORT" env-default:"8084"`
+		} `yaml:"ports"`
+	} `yaml:"service"`
 }
 
 var GlobalConfig Config

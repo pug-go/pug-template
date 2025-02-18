@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	swagger "github.com/swaggo/http-swagger"
 	"google.golang.org/grpc"
@@ -27,34 +28,49 @@ type Handler interface {
 	InitHttpRoutes(mux *runtime.ServeMux, conn *grpc.ClientConn) error
 }
 
-type Server interface {
-	Run() error
+type GrpcServer interface {
+	Run(port int16) error
 	Stop(ctx context.Context) error
+}
+
+type HttpServer interface {
+	Run(grpcPort, httpPort int16) error
+	Stop(ctx context.Context) error
+	SetCors(opts cors.Options)
 }
 
 type App struct {
 	publicCloser *closer.Closer
 	debugCloser  *closer.Closer
 	hc           healthcheck.Handler
+	config       Config
 }
 
-func NewApp() (*App, error) {
+type Config struct {
+	ServiceName string
+	Domain      string
+	GrpcPort    int16
+	HttpPort    int16
+	DebugPort   int16
+}
+
+func NewApp(config Config) (*App, error) {
 	return &App{
 		publicCloser: closer.NewCloser(),
 		debugCloser:  closer.NewCloser(),
 		hc:           healthcheck.NewHandler(),
+		config:       config,
 	}, nil
 }
 
 func (a *App) Run(
-	grpcServer Server,
-	httpServer Server,
-	debugPort int16,
+	grpcServer GrpcServer,
+	httpServer HttpServer,
 ) {
 	// starting servers
 	go a.startGrpcServer(grpcServer)
 	go a.startHttpServer(httpServer)
-	go a.startDebugServer(debugPort)
+	go a.startDebugServer()
 
 	// gracefully shutdown
 	quit := make(chan os.Signal, 1)
@@ -63,7 +79,7 @@ func (a *App) Run(
 	a.shutdown()
 }
 
-func (a *App) startGrpcServer(grpcServer Server) {
+func (a *App) startGrpcServer(grpcServer GrpcServer) {
 	a.publicCloser.Add(func() error {
 		ctx, cancel := context.WithTimeout(context.Background(), gracefulTimeout)
 		defer cancel()
@@ -85,12 +101,20 @@ func (a *App) startGrpcServer(grpcServer Server) {
 		return nil
 	})
 
-	if err := grpcServer.Run(); err != nil {
+	if err := grpcServer.Run(a.config.GrpcPort); err != nil {
 		log.Fatalf("grpc: error occurred while running server: %s", err.Error())
 	}
 }
 
-func (a *App) startHttpServer(httpServer Server) {
+func (a *App) startHttpServer(httpServer HttpServer) {
+	swaggerDomain := fmt.Sprintf("://%s:%d", a.config.Domain, a.config.DebugPort)
+	httpServer.SetCors(cors.Options{
+		AllowedOrigins:   []string{"http" + swaggerDomain, "https" + swaggerDomain},
+		AllowedMethods:   []string{http.MethodHead, http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Source"},
+		AllowCredentials: true,
+	})
+
 	a.publicCloser.Add(func() error {
 		ctx, cancel := context.WithTimeout(context.Background(), gracefulTimeout)
 		defer cancel()
@@ -103,15 +127,14 @@ func (a *App) startHttpServer(httpServer Server) {
 		return nil
 	})
 
-	if err := httpServer.Run(); err != nil && !errors.Is(err, http.ErrServerClosed) {
+	log.Info("debug server listening on: ", a.config.DebugPort)
+	if err := httpServer.Run(a.config.GrpcPort, a.config.HttpPort); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("http.public: error occurred while running server: %s", err.Error())
 	}
 }
 
-func (a *App) startDebugServer(debugPort int16) {
+func (a *App) startDebugServer() {
 	mux := http.NewServeMux()
-
-	// TODO: Pass data for proxy to http server
 
 	swaggerRoute := "docs"
 	swaggerJsonPath := fmt.Sprintf("/%s/swagger.json", swaggerRoute)
@@ -152,19 +175,17 @@ func (a *App) startDebugServer(debugPort int16) {
 			  }
 			});`),
 		swagger.Plugins([]string{"UrlMutatorPlugin"}),
-		//swagger.UIConfig(map[string]string{
-		//	"onComplete": fmt.Sprintf(
-		//		`() => {
-		//			window.ui.setHost(''); // current host
-		//			window.ui.setTitle('%s');
-		//			window.ui.setBasePath('%s');
-		//		}`, appName, basePath),
-		//	"requestInterceptor": fmt.Sprintf(
-		//		`(req) => {
-		//			req.headers["X-Source"] = "%s";
-		//			return req;
-		//	  	}`, appName),
-		//}),
+		swagger.UIConfig(map[string]string{
+			"onComplete": fmt.Sprintf(
+				`() => {
+					window.ui.setHost('%s:%d');
+				}`, a.config.Domain, a.config.HttpPort),
+			"requestInterceptor": fmt.Sprintf(
+				`(req) => {
+					req.headers["X-Source"] = "%s";
+					return req;
+			  	}`, a.config.ServiceName),
+		}),
 	))
 	mux.HandleFunc(healthcheck.CheckHandlerPathReadiness, a.hc.ReadyEndpointHandlerFunc)
 	mux.HandleFunc(healthcheck.CheckHandlerPathLiveness, a.hc.LiveEndpointHandlerFunc)
@@ -173,7 +194,7 @@ func (a *App) startDebugServer(debugPort int16) {
 	// s.Use(middleware.Recovery)
 
 	srv := &http.Server{
-		Addr:    fmt.Sprintf(":%d", debugPort),
+		Addr:    fmt.Sprintf(":%d", a.config.DebugPort),
 		Handler: mux,
 	}
 
