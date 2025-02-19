@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
@@ -34,13 +33,12 @@ func (h *Handler) InitHttpRoutes(mux *runtime.ServeMux, conn *grpc.ClientConn) e
 	// you can create custom handlers dir in internal for clean architecture
 	// documentation: https://grpc-ecosystem.github.io/grpc-gateway/docs/operations/inject_router/
 
-	err = mux.HandlePath(http.MethodGet, "/custom/{name}", func(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
-		panic("boom")
-		_, _ = w.Write([]byte("hello " + pathParams["name"]))
-	})
-	if err != nil {
-		return err
-	}
+	//err = mux.HandlePath(http.MethodGet, "/custom/{name}", func(w http.ResponseWriter, r *http.Request, pathParams map[string]string) {
+	//	_, _ = w.Write([]byte("hello " + pathParams["name"]))
+	//})
+	//if err != nil {
+	//	return err
+	//}
 
 	return nil
 }
