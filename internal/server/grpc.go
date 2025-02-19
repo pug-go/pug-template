@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net"
 
+	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpcRecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -16,7 +18,16 @@ type GrpcServer struct {
 
 func NewGrpcServer(registerServicesFn func(server *grpc.Server)) *GrpcServer {
 	return &GrpcServer{
-		server:             grpc.NewServer(),
+		server: grpc.NewServer(
+			grpc.UnaryInterceptor(grpcMiddleware.ChainUnaryServer(
+				// ...
+				grpcRecovery.UnaryServerInterceptor(), // should be last
+			)),
+			grpc.StreamInterceptor(grpcMiddleware.ChainStreamServer(
+				// ...
+				grpcRecovery.StreamServerInterceptor(), // should be last
+			)),
+		),
 		registerServicesFn: registerServicesFn,
 	}
 }

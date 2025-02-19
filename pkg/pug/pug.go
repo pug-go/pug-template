@@ -18,6 +18,7 @@ import (
 
 	"github.com/pug-go/pug-template/pkg/closer"
 	"github.com/pug-go/pug-template/pkg/healthcheck"
+	"github.com/pug-go/pug-template/pkg/middleware"
 )
 
 const gracefulTimeout = 10 * time.Second
@@ -191,11 +192,9 @@ func (a *App) startDebugServer() {
 	mux.HandleFunc(healthcheck.CheckHandlerPathLiveness, a.hc.LiveEndpointHandlerFunc)
 	// mux.HandleFunc("/metrics", promhttp.Handler())
 
-	// s.Use(middleware.Recovery)
-
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", a.config.DebugPort),
-		Handler: mux,
+		Handler: middleware.Recovery(mux),
 	}
 
 	a.debugCloser.Add(func() error {

@@ -12,6 +12,6 @@ import (
 
 func (h *PugServiceServer) HelloPug(_ context.Context, req *pugv1.HelloPugRequest) (*pugv1.HelloPugResponse, error) {
 	return &pugv1.HelloPugResponse{
-		Message: fmt.Sprintf("Hello %s", req.GetName()),
+		Message: fmt.Sprintf("Hello, %s!", req.GetName()),
 	}, nil
 }

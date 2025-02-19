@@ -7,9 +7,12 @@ import (
 	"context"
 	"fmt"
 
-	pugv1 "github.com/pug-go/pug-template/gen/pug/v1"
 	"google.golang.org/protobuf/types/known/emptypb"
+
+	pugv1 "github.com/pug-go/pug-template/gen/pug/v1"
 )
+
+// TODO
 
 func (h *PugServiceServer) Internal(_ context.Context, req *pugv1.InternalRequest) (*emptypb.Empty, error) {
 	fmt.Println(req.GetMessage())
