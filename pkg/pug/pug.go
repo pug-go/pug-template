@@ -37,7 +37,7 @@ type GrpcServer interface {
 type HttpServer interface {
 	Run(grpcPort, httpPort int16) error
 	Stop(ctx context.Context) error
-	SetCors(opts cors.Options)
+	Use(middleware func(next http.Handler) http.Handler)
 }
 
 type App struct {
@@ -109,7 +109,7 @@ func (a *App) startGrpcServer(grpcServer GrpcServer) {
 
 func (a *App) startHttpServer(httpServer HttpServer) {
 	swaggerDomain := fmt.Sprintf("://%s:%d", a.config.Domain, a.config.DebugPort)
-	httpServer.SetCors(cors.Options{
+	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http" + swaggerDomain, "https" + swaggerDomain},
 		AllowedMethods:   []string{http.MethodHead, http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Source"},
@@ -127,6 +127,8 @@ func (a *App) startHttpServer(httpServer HttpServer) {
 
 		return nil
 	})
+
+	httpServer.Use(c.Handler)
 
 	log.Info("debug server listening on: ", a.config.DebugPort)
 	if err := httpServer.Run(a.config.GrpcPort, a.config.HttpPort); err != nil && !errors.Is(err, http.ErrServerClosed) {

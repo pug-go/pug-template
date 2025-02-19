@@ -6,3 +6,4 @@ TODO:
 - [ ] Write README
 - [ ] Add prometheus
 - [ ] Add jaeger support
+- [ ] Fix custom handler
