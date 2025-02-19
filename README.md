@@ -6,5 +6,7 @@ TODO:
 - [ ] Write README
 - [ ] Add jaeger support
 - [ ] Debug server should be configurable (allow override handlers)
-- [ ] Dont return panic error in grpc resp 
-- [ ] Dont put unused struct to swagger
+- [ ] Check content type
+
+Wait:
+- [ ] ERROR: Failed to extract ServerMetadata from context (https://github.com/grpc-ecosystem/grpc-gateway/issues/4605)
