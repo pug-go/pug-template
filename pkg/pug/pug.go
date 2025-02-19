@@ -112,7 +112,7 @@ func (a *App) startHttpServer(httpServer HttpServer) {
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http" + swaggerDomain, "https" + swaggerDomain},
 		AllowedMethods:   []string{http.MethodHead, http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete, http.MethodOptions},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-Source"},
+		AllowedHeaders:   []string{"*"},
 		AllowCredentials: true,
 	})
 
