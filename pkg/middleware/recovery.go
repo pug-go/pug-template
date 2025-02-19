@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/codes"
 )
 
 func Recovery(next http.Handler) http.Handler {
@@ -14,14 +15,16 @@ func Recovery(next http.Handler) http.Handler {
 			rec := recover()
 			if rec != nil {
 				err := errors.New("panic: " + rec.(string))
+				log.Error(err)
 
-				// TODO: should be grpc-like response
 				resp := struct {
-					Code    int    `json:"code"`
-					Message string `json:"message"`
+					Code    uint32   `json:"code"`
+					Message string   `json:"message"`
+					Details []string `json:"details"`
 				}{
-					Code:    http.StatusInternalServerError,
-					Message: "internal server error",
+					Code:    uint32(codes.Internal),
+					Message: codes.Internal.String(),
+					Details: []string{},
 				}
 
 				w.WriteHeader(http.StatusInternalServerError)

@@ -4,16 +4,6 @@ package pug.v1;
 option go_package = "github.com/pug-go/pug/gen/proto/v1/pugpb;pugv1pb";
 
 import "google/api/annotations.proto";
-import "google/protobuf/empty.proto";
-import "protoc-gen-openapiv2/options/annotations.proto";
-
-option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
-  info: {
-    title: "PugService API";
-    version: "1.0.0";
-    description: "API для сервиса Pug";
-  };
-};
 
 service PugService {
   rpc HelloPug(HelloPugRequest) returns (HelloPugResponse) {
@@ -21,7 +11,7 @@ service PugService {
       get: "/v1/pugs/hello/{name}"
     };
   }
-  rpc Internal(InternalRequest) returns (google.protobuf.Empty) {}
+  rpc InternalHelloPug(InternalHelloPugRequest) returns (InternalHelloPugResponse) {}
 }
 
 message HelloPugRequest {
@@ -32,6 +22,10 @@ message HelloPugResponse {
   string message = 1;
 }
 
-message InternalRequest {
+message InternalHelloPugRequest {
+  string name = 1;
+}
+
+message InternalHelloPugResponse {
   string message = 1;
 }

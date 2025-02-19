@@ -2,7 +2,7 @@
   "swagger": "2.0",
   "info": {
     "title": "PugService API",
-    "description": "API для сервиса Pug",
+    "description": "API for Pug service",
     "version": "1.0.0"
   },
   "tags": [
@@ -78,6 +78,14 @@
       }
     },
     "v1HelloPugResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InternalHelloPugResponse": {
       "type": "object",
       "properties": {
         "message": {

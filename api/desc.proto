@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/pug-go/pug/gen/proto/descpb;descpb";
+
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+// Representation of OpenAPI v2 specification's Swagger object.
+// See: https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#swaggerObject
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+  info: {
+    title: "PugService API";
+    version: "1.0.0";
+    description: "API for Pug service";
+  };
+};
