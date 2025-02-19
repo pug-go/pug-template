@@ -6,3 +6,4 @@ TODO:
 - [ ] Write README
 - [ ] Add prometheus
 - [ ] Add jaeger support
+- [ ] Debug server should be configurable (allow override handlers)

@@ -15,7 +15,7 @@ func Recovery(next http.Handler) http.Handler {
 			if rec != nil {
 				err := errors.New("panic: " + rec.(string))
 
-				w.WriteHeader(http.StatusInternalServerError)
+				// TODO: should be grpc-like response
 				resp := struct {
 					Code    int    `json:"code"`
 					Message string `json:"message"`

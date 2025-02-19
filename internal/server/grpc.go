@@ -9,6 +9,8 @@ import (
 	grpcRecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+
+	"github.com/pug-go/pug-template/pkg/interceptor"
 )
 
 type GrpcServer struct {
@@ -20,11 +22,13 @@ func NewGrpcServer(registerServicesFn func(server *grpc.Server)) *GrpcServer {
 	return &GrpcServer{
 		server: grpc.NewServer(
 			grpc.UnaryInterceptor(grpcMiddleware.ChainUnaryServer(
-				// ...
+				interceptor.UnaryServerPrometheus(),
+				// put your interceptors here
 				grpcRecovery.UnaryServerInterceptor(), // should be last
 			)),
 			grpc.StreamInterceptor(grpcMiddleware.ChainStreamServer(
-				// ...
+				interceptor.StreamServerPrometheus(),
+				// put your interceptors here
 				grpcRecovery.StreamServerInterceptor(), // should be last
 			)),
 		),

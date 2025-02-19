@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
 	log "github.com/sirupsen/logrus"
 	swagger "github.com/swaggo/http-swagger"
@@ -192,7 +193,7 @@ func (a *App) startDebugServer() {
 	))
 	mux.HandleFunc(healthcheck.CheckHandlerPathReadiness, a.hc.ReadyEndpointHandlerFunc)
 	mux.HandleFunc(healthcheck.CheckHandlerPathLiveness, a.hc.LiveEndpointHandlerFunc)
-	// mux.HandleFunc("/metrics", promhttp.Handler())
+	mux.HandleFunc("/metrics", promhttp.Handler().ServeHTTP)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%d", a.config.DebugPort),

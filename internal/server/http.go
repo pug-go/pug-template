@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/pug-go/pug-template/pkg/middleware"
 )
@@ -26,8 +27,16 @@ type HttpServer struct {
 func NewHttpServer(initHttpRoutesFn InitHttpRoutesFn) *HttpServer {
 	middlewares := []func(next http.Handler) http.Handler{
 		// put your http middlewares here
+		middleware.Prometheus,
 		middleware.Recovery,
 	}
+
+	gwmux := runtime.NewServeMux(
+		// put your opts here
+		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
+			return metadata.Pairs("x-from-grpc-gateway", "true")
+		}),
+	)
 
 	return &HttpServer{
 		server: &http.Server{
@@ -36,7 +45,7 @@ func NewHttpServer(initHttpRoutesFn InitHttpRoutesFn) *HttpServer {
 		},
 		initHttpRoutesFn: initHttpRoutesFn,
 		middlewares:      middlewares,
-		gwmux:            runtime.NewServeMux(),
+		gwmux:            gwmux,
 	}
 }
 
