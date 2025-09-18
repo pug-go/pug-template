@@ -9,11 +9,9 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 
+	"github.com/pug-go/pug-template/pkg/gwopts"
 	"github.com/pug-go/pug-template/pkg/middleware"
 )
 
@@ -27,18 +25,14 @@ type HttpServer struct {
 }
 
 func NewHttpServer(initHttpRoutesFn InitHttpRoutesFn) *HttpServer {
-	middlewares := []func(next http.Handler) http.Handler{
+	middlewares := middleware.New(
 		// put your http middlewares here
-		middleware.Prometheus,
-		middleware.Recovery,
-	}
+		middleware.Default...,
+	)
 
 	gwmux := runtime.NewServeMux(
 		// put your opts here
-		runtime.WithErrorHandler(handleHttpError),
-		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
-			return metadata.Pairs("x-from-grpc-gateway", "true")
-		}),
+		gwopts.Default...,
 	)
 
 	return &HttpServer{
@@ -88,30 +82,4 @@ func (s *HttpServer) applyMiddlewares(handler http.Handler) http.Handler {
 	}
 
 	return handler
-}
-
-func handleHttpError(
-	ctx context.Context,
-	mux *runtime.ServeMux,
-	marshaler runtime.Marshaler,
-	w http.ResponseWriter,
-	r *http.Request,
-	err error,
-) {
-	if s, ok := status.FromError(err); ok {
-		// remove internal error from http response
-		if s.Code() == codes.Internal {
-			log.Error(s.Message())
-
-			w.Header().Set("Content-Type", "application/json; charset=utf-8")
-			w.WriteHeader(http.StatusInternalServerError)
-			_, err = w.Write([]byte(`{"code": 13, "message": "Internal"}`))
-			if err != nil {
-				log.Error(err)
-			}
-			return
-		}
-	}
-
-	runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
 }

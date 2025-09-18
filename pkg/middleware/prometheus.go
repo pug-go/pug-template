@@ -11,12 +11,12 @@ func Prometheus(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		started := time.Now()
 
-		path := r.URL.Path
-		handler := "HTTP " + r.Method + ": " + path
-
 		rw := &rwWrapper{ResponseWriter: w}
 		next.ServeHTTP(rw, r)
+
 		status := promlib.HttpCodeToStatus(rw.status)
+		pattern := popParam("pattern", w.Header())
+		handler := "HTTP " + r.Method + ": " + pattern
 
 		// pug_requests_total
 		promlib.RequestsTotal.WithLabelValues(
