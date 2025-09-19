@@ -1,7 +1,7 @@
 # pug-template
 
 TODO:
-- [ ] Add protoc-gen-validate
+- [x] Add protoc-gen-validate
 - [ ] Add handler generation
 - [ ] Write README
 - [ ] Add jaeger support ([tracing](https://grpc-ecosystem.github.io/grpc-gateway/docs/operations/tracing/))

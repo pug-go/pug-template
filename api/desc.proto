@@ -9,7 +9,7 @@ import "protoc-gen-openapiv2/options/annotations.proto";
 
 option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
   info: {
-    title: "PugService API";
+    title: "pug-api";
     version: "1.0.0";
     description: "API for Pug service";
   };

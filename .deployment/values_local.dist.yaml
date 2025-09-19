@@ -1,5 +1,5 @@
 service:
-  name: "pug"
+  name: "pug-api"
   basePath: ""
   domain: "localhost"
   ports:

@@ -32,8 +32,14 @@ func main() {
 	}
 
 	handlers := handler.New()
-	grpcServer := server.NewGrpcServer(handlers.RegisterGrpcServices)
-	httpServer := server.NewHttpServer(handlers.InitHttpRoutes)
+	grpcServer, err := server.NewGrpcServer(handlers.RegisterGrpcServices)
+	if err != nil {
+		panic(err)
+	}
+	httpServer, err := server.NewHttpServer(handlers.InitHttpRoutes)
+	if err != nil {
+		panic(err)
+	}
 
 	app, err := pug.NewApp(pug.Config{
 		ServiceName: cfg.Service.Name,

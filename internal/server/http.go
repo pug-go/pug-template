@@ -24,7 +24,7 @@ type HttpServer struct {
 	gwmux            *runtime.ServeMux
 }
 
-func NewHttpServer(initHttpRoutesFn InitHttpRoutesFn) *HttpServer {
+func NewHttpServer(initHttpRoutesFn InitHttpRoutesFn) (*HttpServer, error) {
 	middlewares := middleware.New(
 		// put your http middlewares here
 		middleware.Default...,
@@ -43,7 +43,7 @@ func NewHttpServer(initHttpRoutesFn InitHttpRoutesFn) *HttpServer {
 		initHttpRoutesFn: initHttpRoutesFn,
 		middlewares:      middlewares,
 		gwmux:            gwmux,
-	}
+	}, nil
 }
 
 func (s *HttpServer) Run(grpcPort, httpPort int16) error {
