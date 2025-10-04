@@ -26,7 +26,12 @@ func UnaryServerValidationsRu(validator protovalidate.Validator) func(
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
-	return func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+	return func(
+		ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler,
+	) (interface{}, error) {
 		if err := validateMsg(req, validator); err != nil {
 			return nil, err
 		}
@@ -40,7 +45,12 @@ func StreamServerValidationsRu(validator protovalidate.Validator) func(
 	info *grpc.StreamServerInfo,
 	handler grpc.StreamHandler,
 ) error {
-	return func(srv interface{}, stream grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(
+		srv interface{},
+		stream grpc.ServerStream,
+		info *grpc.StreamServerInfo,
+		handler grpc.StreamHandler,
+	) error {
 		return handler(srv, &wrappedServerStream{
 			ServerStream: stream,
 			validator:    validator,
