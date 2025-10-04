@@ -61,7 +61,10 @@ func (w *wrappedServerStream) RecvMsg(m interface{}) error {
 }
 
 func validateMsg(m interface{}, validator protovalidate.Validator) error {
-	msg, ok := m.(proto.Message)
+	var ok bool
+	var msg proto.Message
+
+	msg, ok = m.(proto.Message)
 	if !ok {
 		return status.Errorf(codes.Internal, "unsupported message type: %T", m)
 	}
@@ -71,10 +74,11 @@ func validateMsg(m interface{}, validator protovalidate.Validator) error {
 	}
 
 	var valErr *protovalidate.ValidationError
+	var tmpl string
 	if errors.As(err, &valErr) {
 		for _, violation := range valErr.Violations {
 			ruleID := violation.Proto.GetRuleId()
-			tmpl, ok := ruTemplates[ruleID]
+			tmpl, ok = ruTemplates[ruleID]
 			if !ok {
 				continue
 			}
