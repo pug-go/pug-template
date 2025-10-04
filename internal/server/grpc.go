@@ -31,14 +31,12 @@ func NewGrpcServer(registerServicesFn func(server *grpc.Server)) (*GrpcServer, e
 				interceptor.UnaryServerPrometheus(),
 				interceptor.UnaryServerValidationsRu(validator),
 				// put your interceptors here
-
 				grpcRecovery.UnaryServerInterceptor(), // should be last
 			)),
 			grpc.StreamInterceptor(grpcMiddleware.ChainStreamServer(
 				interceptor.StreamServerPrometheus(),
 				interceptor.StreamServerValidationsRu(validator),
 				// put your interceptors here
-
 				grpcRecovery.StreamServerInterceptor(), // should be last
 			)),
 		),
