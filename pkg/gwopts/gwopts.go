@@ -79,10 +79,24 @@ func handleHttpError(
 			}
 			return
 		}
-		// TODO: Добавить остальные ошибки из responser.go:
-		// Not found
-		// Forbidden
-		// Unauthorized
+
+		// all other errors
+		httpCode := runtime.HTTPStatusFromCode(s.Code())
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(httpCode)
+
+		if s.Code() == codes.Unauthenticated {
+			w.Header().Set("WWW-Authenticate", s.Message())
+		}
+
+		err = json.NewEncoder(w).Encode(map[string]any{
+			"code":    httpCode,
+			"message": http.StatusText(httpCode),
+		})
+		if err != nil {
+			log.Error(err)
+		}
+		return
 	}
 
 	runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
