@@ -8,7 +8,6 @@ import (
 	"buf.build/go/protovalidate"
 	grpcMiddleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpcRecovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	protovalidateMiddleware "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/protovalidate"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
@@ -30,14 +29,16 @@ func NewGrpcServer(registerServicesFn func(server *grpc.Server)) (*GrpcServer, e
 		server: grpc.NewServer(
 			grpc.UnaryInterceptor(grpcMiddleware.ChainUnaryServer(
 				interceptor.UnaryServerPrometheus(),
-				protovalidateMiddleware.UnaryServerInterceptor(validator),
+				interceptor.UnaryServerValidationsRu(validator),
 				// put your interceptors here
+
 				grpcRecovery.UnaryServerInterceptor(), // should be last
 			)),
 			grpc.StreamInterceptor(grpcMiddleware.ChainStreamServer(
 				interceptor.StreamServerPrometheus(),
-				protovalidateMiddleware.StreamServerInterceptor(validator),
+				interceptor.StreamServerValidationsRu(validator),
 				// put your interceptors here
+
 				grpcRecovery.StreamServerInterceptor(), // should be last
 			)),
 		),
