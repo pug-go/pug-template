@@ -7,11 +7,12 @@ import (
 	"text/template"
 
 	"buf.build/go/protovalidate"
-	"github.com/AlekSi/pointer"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+
+	"github.com/pug-go/pug-template/pkg/ref"
 )
 
 type ErrorInfo struct {
@@ -106,7 +107,7 @@ func validateMsg(m interface{}, validator protovalidate.Validator) error {
 			})
 
 			// overwrite the violation message with our localized/rendered text
-			violation.Proto.Message = pointer.ToString(buf.String())
+			violation.Proto.Message = ref.ToPtr(buf.String())
 		}
 
 		st := status.New(codes.InvalidArgument, err.Error())
