@@ -1,8 +1,9 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "pug/v1/pug.proto",
-    "version": "version not set"
+    "title": "pug-api",
+    "description": "API for Pug service",
+    "version": "1.0.0"
   },
   "tags": [
     {
@@ -16,7 +17,7 @@
     "application/json"
   ],
   "paths": {
-    "/v2/pugs/hello": {
+    "/v1/pugs/hello/{name}": {
       "get": {
         "operationId": "PugService_HelloPug",
         "responses": {
@@ -36,9 +37,19 @@
         "parameters": [
           {
             "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "emails",
             "in": "query",
             "required": false,
-            "type": "string"
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
           }
         ],
         "tags": [
@@ -77,6 +88,14 @@
       }
     },
     "v1HelloPugResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string"
+        }
+      }
+    },
+    "v1InternalHelloPugResponse": {
       "type": "object",
       "properties": {
         "message": {

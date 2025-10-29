@@ -1,18 +1,24 @@
 version: v2
 deps:
   - buf.build/googleapis/googleapis
+  - buf.build/grpc-ecosystem/grpc-gateway
+  - buf.build/bufbuild/protovalidate
 modules:
-  - path: proto
+  - path: api
 lint:
+  ignore:
+    - api/desc.proto
   use:
-    - DEFAULT
+    - STANDARD
+  rpc_allow_google_protobuf_empty_requests: true
+  rpc_allow_google_protobuf_empty_responses: true
   except:
     - FIELD_NOT_REQUIRED
     - PACKAGE_NO_IMPORT_CYCLE
-  disallow_comment_ignores: true
 breaking:
   use:
     - FILE
   except:
     - EXTENSION_NO_DELETE
     - FIELD_SAME_DEFAULT
+    - RPC_NO_DELETE

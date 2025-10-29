@@ -4,14 +4,13 @@
 // - protoc             (unknown)
 // source: pug/v1/pug.proto
 
-package pugv1
+package pugv1pb
 
 import (
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -20,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	PugService_HelloPug_FullMethodName = "/pug.v1.PugService/HelloPug"
-	PugService_Internal_FullMethodName = "/pug.v1.PugService/Internal"
+	PugService_HelloPug_FullMethodName         = "/pug.v1.PugService/HelloPug"
+	PugService_InternalHelloPug_FullMethodName = "/pug.v1.PugService/InternalHelloPug"
 )
 
 // PugServiceClient is the client API for PugService service.
@@ -29,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PugServiceClient interface {
 	HelloPug(ctx context.Context, in *HelloPugRequest, opts ...grpc.CallOption) (*HelloPugResponse, error)
-	Internal(ctx context.Context, in *InternalRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	InternalHelloPug(ctx context.Context, in *InternalHelloPugRequest, opts ...grpc.CallOption) (*InternalHelloPugResponse, error)
 }
 
 type pugServiceClient struct {
@@ -50,10 +49,10 @@ func (c *pugServiceClient) HelloPug(ctx context.Context, in *HelloPugRequest, op
 	return out, nil
 }
 
-func (c *pugServiceClient) Internal(ctx context.Context, in *InternalRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *pugServiceClient) InternalHelloPug(ctx context.Context, in *InternalHelloPugRequest, opts ...grpc.CallOption) (*InternalHelloPugResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, PugService_Internal_FullMethodName, in, out, cOpts...)
+	out := new(InternalHelloPugResponse)
+	err := c.cc.Invoke(ctx, PugService_InternalHelloPug_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +64,7 @@ func (c *pugServiceClient) Internal(ctx context.Context, in *InternalRequest, op
 // for forward compatibility
 type PugServiceServer interface {
 	HelloPug(context.Context, *HelloPugRequest) (*HelloPugResponse, error)
-	Internal(context.Context, *InternalRequest) (*emptypb.Empty, error)
+	InternalHelloPug(context.Context, *InternalHelloPugRequest) (*InternalHelloPugResponse, error)
 	mustEmbedUnimplementedPugServiceServer()
 }
 
@@ -76,8 +75,8 @@ type UnimplementedPugServiceServer struct {
 func (UnimplementedPugServiceServer) HelloPug(context.Context, *HelloPugRequest) (*HelloPugResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HelloPug not implemented")
 }
-func (UnimplementedPugServiceServer) Internal(context.Context, *InternalRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Internal not implemented")
+func (UnimplementedPugServiceServer) InternalHelloPug(context.Context, *InternalHelloPugRequest) (*InternalHelloPugResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method InternalHelloPug not implemented")
 }
 func (UnimplementedPugServiceServer) mustEmbedUnimplementedPugServiceServer() {}
 
@@ -110,20 +109,20 @@ func _PugService_HelloPug_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PugService_Internal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InternalRequest)
+func _PugService_InternalHelloPug_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InternalHelloPugRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PugServiceServer).Internal(ctx, in)
+		return srv.(PugServiceServer).InternalHelloPug(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PugService_Internal_FullMethodName,
+		FullMethod: PugService_InternalHelloPug_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PugServiceServer).Internal(ctx, req.(*InternalRequest))
+		return srv.(PugServiceServer).InternalHelloPug(ctx, req.(*InternalHelloPugRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -140,8 +139,8 @@ var PugService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _PugService_HelloPug_Handler,
 		},
 		{
-			MethodName: "Internal",
-			Handler:    _PugService_Internal_Handler,
+			MethodName: "InternalHelloPug",
+			Handler:    _PugService_InternalHelloPug_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
