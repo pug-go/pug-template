@@ -3,7 +3,7 @@
 TODO:
 - [ ] Add handler generation
 - [ ] Write README
-- [ ] Check content type
+- [ ] Check content type (application/json)
 - [ ] Move to gitlab
 
 Later:
