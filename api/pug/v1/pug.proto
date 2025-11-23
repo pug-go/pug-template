@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package pug.v1;
-option go_package = "github.com/pug-go/pug/gen/proto/v1/pugpb;pugv1pb";
+option go_package = "github.com/pug-go/pug-template/gen/pug/v1;pugv1pb";
 
 import "google/api/annotations.proto";
 import "buf/validate/validate.proto";

@@ -19,3 +19,7 @@ plugins:
       - allow_merge=true
       - merge_file_name=app
       - generate_unbound_methods=false
+  - local: bin/protoc-gen-pog
+    out: internal/handler
+    opt:
+      - out_root=internal/handler
