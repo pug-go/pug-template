@@ -88,6 +88,7 @@ func genServiceStruct(
 	pbImportPath string,
 ) {
 	serviceName := service.GoName + "Server"
+	methodName := "New" + service.GoName
 
 	file.P("import  ", pbPkgName, ` "`, pbImportPath, `"`)
 	file.P("type ", serviceName, " struct {")
@@ -95,7 +96,8 @@ func genServiceStruct(
 	file.P("  // add dependencies here (services, etc.)")
 	file.P("}")
 	file.P()
-	file.P("func New", service.GoName, "() *", serviceName, "{\n\treturn &", serviceName, "{}\n}")
+	file.P("// ", methodName, " TODO: Don't forget to register service in init.go")
+	file.P("func ", methodName, "() *", serviceName, "{\n\treturn &", serviceName, "{}\n}")
 	file.P()
 }
 
