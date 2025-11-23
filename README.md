@@ -19,6 +19,8 @@ $ make fmt
 ```
 
 TODO:
-- [ ] Add jaeger support ([tracing](https://grpc-ecosystem.github.io/grpc-gateway/docs/operations/tracing/))
+- [ ] Move to gitlab
+- [ ] Refactor protoc-gen-pug
 - [ ] Add dao and postgres support
 - [ ] Add gitlab ci/cd
+- [ ] Add jaeger support ([tracing](https://grpc-ecosystem.github.io/grpc-gateway/docs/operations/tracing/))
