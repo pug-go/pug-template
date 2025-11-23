@@ -1,10 +1,24 @@
 # pug-template
 
-TODO:
-- [x] Add handler generation
-- [ ] Write README
-- [ ] Check content type (application/json)
-- [ ] Move to gitlab
+Backend service boilerplate.
 
-Later:
+```bash
+# write proto api/{service}/v1/{service}.proto
+
+# generate handlers (also `make fast-generate` if deps already installed)
+$ make generate
+
+# run unit tests
+$ make test
+
+# lint code
+$ make lint
+
+# fix code
+$ make fmt
+```
+
+TODO:
 - [ ] Add jaeger support ([tracing](https://grpc-ecosystem.github.io/grpc-gateway/docs/operations/tracing/))
+- [ ] Add dao and postgres support
+- [ ] Add gitlab ci/cd
