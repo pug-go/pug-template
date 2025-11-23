@@ -21,3 +21,5 @@ plugins:
       - generate_unbound_methods=false
   - local: bin/protoc-gen-pog
     out: internal/handler
+    opt:
+      - out_root=internal/handler

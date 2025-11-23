@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"path"
 	"strings"
 	"unicode"
@@ -9,9 +10,18 @@ import (
 )
 
 // TODO: Refactor
+var outRoot string
 
 func main() {
-	opts := protogen.Options{}
+	opts := protogen.Options{
+		ParamFunc: func(name string, value string) error {
+			switch name {
+			case "out_root":
+				outRoot = value
+			}
+			return nil
+		},
+	}
 	opts.Run(func(plugin *protogen.Plugin) error {
 		for _, file := range plugin.Files {
 			if !file.Generate {
@@ -36,15 +46,17 @@ func generateFiles(plugin *protogen.Plugin, file *protogen.File) {
 		pkg = pkg[:len(pkg)-2]
 	}
 
-	serviceFilename := path.Join(dir, "service.go")
-	serviceFile := plugin.NewGeneratedFile(serviceFilename, file.GoImportPath)
-
-	writeHeader(serviceFile, protoPath, pkg)
-
 	pbPkgName := string(file.GoPackageName)
 	pbImportPath := string(file.GoImportPath)
-	for _, service := range file.Services {
-		genServiceStruct(serviceFile, service, pbPkgName, pbImportPath)
+
+	serviceFilename := path.Join(dir, "service.go")
+	if !fileExists(serviceFilename) {
+		serviceFile := plugin.NewGeneratedFile(serviceFilename, file.GoImportPath)
+		writeHeader(serviceFile, protoPath, pkg)
+
+		for _, service := range file.Services {
+			genServiceStruct(serviceFile, service, pbPkgName, pbImportPath)
+		}
 	}
 
 	for _, service := range file.Services {
@@ -53,6 +65,10 @@ func generateFiles(plugin *protogen.Plugin, file *protogen.File) {
 				dir,
 				toSnakeCase(method.GoName)+".go",
 			)
+
+			if fileExists(methodFilename) {
+				continue
+			}
 
 			methodFile := plugin.NewGeneratedFile(methodFilename, file.GoImportPath)
 			writeHeader(methodFile, protoPath, pkg)
@@ -138,4 +154,10 @@ func toSnakeCase(s string) string {
 		}
 	}
 	return b.String()
+}
+
+func fileExists(rel string) bool {
+	full := path.Join(outRoot, rel)
+	_, err := os.Stat(full)
+	return err == nil
 }

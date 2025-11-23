@@ -10,6 +10,7 @@ type PugServiceServer struct {
 	// add dependencies here (services, etc.)
 }
 
+// NewPugService TODO: Don't forget to register service in init.go
 func NewPugService() *PugServiceServer {
 	return &PugServiceServer{}
 }
