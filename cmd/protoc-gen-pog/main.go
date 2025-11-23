@@ -8,6 +8,8 @@ import (
 	"google.golang.org/protobuf/compiler/protogen"
 )
 
+// TODO: Refactor
+
 func main() {
 	opts := protogen.Options{}
 	opts.Run(func(plugin *protogen.Plugin) error {
@@ -38,15 +40,13 @@ func generateFiles(plugin *protogen.Plugin, file *protogen.File) {
 	serviceFile := plugin.NewGeneratedFile(serviceFilename, file.GoImportPath)
 
 	writeHeader(serviceFile, protoPath, pkg)
-	// импортов можно не делать, если тут только struct'и
-	// но если нужны будут deps — добавишь import-блок
-
-	for _, service := range file.Services {
-		genServiceStruct(serviceFile, service)
-	}
 
 	pbPkgName := string(file.GoPackageName)
 	pbImportPath := string(file.GoImportPath)
+	for _, service := range file.Services {
+		genServiceStruct(serviceFile, service, pbPkgName, pbImportPath)
+	}
+
 	for _, service := range file.Services {
 		for _, method := range service.Methods {
 			methodFilename := path.Join(
@@ -81,14 +81,21 @@ func writeHeader(
 	file.P()
 }
 
-func genServiceStruct(file *protogen.GeneratedFile, service *protogen.Service) {
+func genServiceStruct(
+	file *protogen.GeneratedFile,
+	service *protogen.Service,
+	pbPkgName string,
+	pbImportPath string,
+) {
 	serviceName := service.GoName + "Server"
 
-	file.P("// ", serviceName, " is a stub implementation.")
-	file.P("// TODO: wire it in your app.")
+	file.P("import  ", pbPkgName, ` "`, pbImportPath, `"`)
 	file.P("type ", serviceName, " struct {")
-	file.P("  // TODO: add dependencies here (services, etc.)")
+	file.P("  ", pbPkgName, ".Unimplemented", serviceName)
+	file.P("  // add dependencies here (services, etc.)")
 	file.P("}")
+	file.P()
+	file.P("func New", service.GoName, "() *", serviceName, "{\n\treturn &", serviceName, "{}\n}")
 	file.P()
 }
 

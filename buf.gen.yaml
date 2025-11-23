@@ -21,4 +21,3 @@ plugins:
       - generate_unbound_methods=false
   - local: bin/protoc-gen-pog
     out: internal/handler
-    # opt: можно добавить позже, когда захочешь параметры
