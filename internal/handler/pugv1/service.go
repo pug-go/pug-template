@@ -3,10 +3,10 @@
 
 package pugv1
 
-import pugv1 "github.com/pug-go/pug-template/gen/pug/v1"
+import pugv1pb "github.com/pug-go/pug-template/gen/pug/v1"
 
 type PugServiceServer struct {
-	pugv1.UnimplementedPugServiceServer
+	pugv1pb.UnimplementedPugServiceServer
 }
 
 func NewPugService() *PugServiceServer {

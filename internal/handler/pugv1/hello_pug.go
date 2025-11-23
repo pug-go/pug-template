@@ -7,11 +7,11 @@ import (
 	"context"
 	"fmt"
 
-	pugv1 "github.com/pug-go/pug-template/gen/pug/v1"
+	pugv1pb "github.com/pug-go/pug-template/gen/pug/v1"
 )
 
-func (h *PugServiceServer) HelloPug(_ context.Context, req *pugv1.HelloPugRequest) (*pugv1.HelloPugResponse, error) {
-	return &pugv1.HelloPugResponse{
+func (h *PugServiceServer) HelloPug(_ context.Context, req *pugv1pb.HelloPugRequest) (*pugv1pb.HelloPugResponse, error) {
+	return &pugv1pb.HelloPugResponse{
 		Message: fmt.Sprintf("Hello, %s!", req.GetName()),
 	}, nil
 }

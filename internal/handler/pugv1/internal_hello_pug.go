@@ -7,11 +7,11 @@ import (
 	"context"
 	"fmt"
 
-	pugv1 "github.com/pug-go/pug-template/gen/pug/v1"
+	pugv1pb "github.com/pug-go/pug-template/gen/pug/v1"
 )
 
-func (h *PugServiceServer) InternalHelloPug(_ context.Context, req *pugv1.InternalHelloPugRequest) (*pugv1.InternalHelloPugResponse, error) {
-	return &pugv1.InternalHelloPugResponse{
+func (h *PugServiceServer) InternalHelloPug(_ context.Context, req *pugv1pb.InternalHelloPugRequest) (*pugv1pb.InternalHelloPugResponse, error) {
+	return &pugv1pb.InternalHelloPugResponse{
 		Message: fmt.Sprintf("Internal Hello, %s!", req.GetName()),
 	}, nil
 }
