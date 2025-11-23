@@ -1,7 +1,7 @@
 # pug-template
 
 TODO:
-- [ ] Add handler generation
+- [x] Add handler generation
 - [ ] Write README
 - [ ] Check content type (application/json)
 - [ ] Move to gitlab
