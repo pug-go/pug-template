@@ -28,8 +28,8 @@ func main() {
 
 func generateFiles(plugin *protogen.Plugin, file *protogen.File) {
 	protoPath := file.Desc.Path()
-	base := strings.TrimSuffix(protoPath, path.Ext(protoPath))
-	dir, _ := path.Split(base)
+	base, _ := path.Split(strings.TrimSuffix(protoPath, path.Ext(protoPath)))
+	dir := strings.ReplaceAll(base, "/", "")
 
 	pkg := file.GoPackageName
 	if strings.HasSuffix(string(pkg), "pb") {
